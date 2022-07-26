@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="file" class="file" name="files" />
+    <canvas id="h" width="256" height="256"></canvas>
+    <canvas id="r" width="256" height="256"></canvas>
+    <canvas id="a" width="256" height="256"></canvas>
+    <script type="module">
+      import { NIFTI, FormatNIFTI } from './build/es6/index.js';
+      const nifti = new NIFTI();
+      const upload = document.querySelector('.file');
+      const startRead = (fileData) => {
+        const isZip = nifti.isZip(fileData);
+        if (isZip) {
+          fileData = nifti.deZip(fileData);
+        }
+        nifti.parseHeader(fileData);
+        nifti.pickImage(fileData);
+        const formatNIFTI = new FormatNIFTI({
+          data: nifti.imageData,
+          header: nifti.header,
+        });
+        formatNIFTI.render(128, 128, 128);
+        Object.keys(formatNIFTI.forMatData).forEach((key) => {
+          const canvas = document.querySelector(`#${key}`);
+          const ctx = canvas.getContext('2d');
+          const canvasImageData = ctx.createImageData(
+            canvas.width,
+            canvas.height,
+          );
+          formatNIFTI.forMatData[key].forEach((item, index) => {
+            canvasImageData.data[index * 4] = item;
+            canvasImageData.data[index * 4 + 1] = item;
+            canvasImageData.data[index * 4 + 2] = item;
+            canvasImageData.data[index * 4 + 3] = 0xff;
+          });
+          ctx.putImageData(canvasImageData, 0, 0);
+          // ctx.putImageData(new Uint8ClampedArray(formatNIFTI.forMatData[key]), 0, 0);
+        });
+        console.log(formatNIFTI.forMatData);
+      };
+      upload.addEventListener('change', (e) => {
+        const blob = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = function (evt) {
+          if (evt.target.readyState === FileReader.DONE) {
+            startRead(evt.target.result);
+          }
+        };
+
+        reader.readAsArrayBuffer(blob);
+      });
+      console.log(NIFTI);
+    </script>
+  </body>
+</html>

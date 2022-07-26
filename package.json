@@ -1,0 +1,29 @@
+{
+  "name": "niftijs",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "umd:main": "dist/niftijs.umd.production.js",
+  "module": "dist/niftijs.esm.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "test": "ts-lib-tools test",
+    "build": "ts-lib-tools build --simple",
+    "format": "ts-lib-tools format",
+    "lint": "ts-lib-tools lint",
+    "release": "yarn build && yarn publish dist"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "ts-lib-tools": "^0.14.5"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.18.6",
+    "@types/pako": "^2.0.0",
+    "pako": "^2.0.4",
+    "tslib": "^2.4.0"
+  }
+}
